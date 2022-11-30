@@ -1,0 +1,50 @@
+[
+    {
+        "Action": ["ec2:DescribeImages", "ec2:DescribeInstances"],
+        "Resource": ["*"]
+    },
+    {
+        "Action": ["ec2:TerminateInstances"],
+        "Resource": ["arn:aws:ec2:*:*:instance/*"],
+        "Condition": {
+            "ForAnyValue:StringLike": {
+                "ec2:ResourceTag/owner": ["*"]
+            }
+        }
+    },
+    {
+        "Sid": "AllowRunInstances",
+        "Action": ["ec2:RunInstances"],
+        "Resource": [
+            "arn:aws:ec2:*::image/*",
+            "arn:aws:ec2:*::snapshot/*",
+            "arn:aws:ec2:*:*:subnet/*",
+            "arn:aws:ec2:*:*:network-interface/*",
+            "arn:aws:ec2:*:*:security-group/*",
+            "arn:aws:ec2:*:*:key-pair/*",
+            "arn:aws:ec2:*:*:volume/*"
+        ]
+    },
+    {
+        "Action": ["ec2:RunInstances"],
+        "Resource": ["arn:aws:ec2:*:*:instance/*"],
+        "Condition": {
+            "StringLike": {
+                "aws:RequestTag/owner": "*"
+            },
+            "ForAllValues:StringEquals": {
+                "aws:TagKeys": ["owner"],
+                "ec2:InstanceType": ["t2.nano"]
+            }
+        }
+    },
+    {
+        "Action": ["ec2:CreateTags"],
+        "Resource": ["arn:aws:ec2:*:*:instance/*"],
+        "Condition": {
+            "StringEquals": {
+                "ec2:CreateAction": ["RunInstances"]
+            }
+        }
+    }
+]
